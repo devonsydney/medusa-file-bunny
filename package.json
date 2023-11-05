@@ -1,15 +1,16 @@
 {
-  "name": "medusa-file-bunny",
-  "version": "0.0.4",
+  "name": "@devon/medusa-file-bunny",
+  "version": "0.0.5",
   "description": "bunny.net file connector for Medusa",
-  "author": "Tsvetan Nikolov <live.webscore@gmail.com>",
+  "author": "Devon <devon.boultonmills@gmail.com>",
   "license": "MIT",
   "keywords": [
     "ecommerce",
     "medusa",
     "medusa-plugin",
     "bunny.net",
-    "medusa-plugin-storage"
+    "medusa-plugin-storage",
+    "fork"
   ],
   "scripts": {
     "clean": "cross-env ./node_modules/.bin/rimraf dist",
@@ -27,7 +28,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tsvetann/medusa-file-bunny.git"
+    "url": "https://github.com/devonsydney/medusa-file-bunny.git"
   },
   "dependencies": {
     "node-fetch": "^2.6.11",

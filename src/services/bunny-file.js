@@ -1,8 +1,8 @@
 import { FileService } from "medusa-interfaces";
-import * as fs from "fs"
-const fetch = require('node-fetch');
-import stream from "stream"
-const https = require('https');
+import fs from "fs";
+import fetch from "node-fetch";
+import stream from "stream";
+import https from "https";
 
 function getReadStreamFromCDN(url) {
   return new Promise((resolve, reject) => {
@@ -19,23 +19,21 @@ function getReadStreamFromCDN(url) {
   });
 }
 
-// create medusajs file service which integrates with bunny cdn
 class BunnyFileService extends FileService {
-
-  options = {
-    storage: {
-      storageUploadEndPoint: process.env.BUNNY_STORAGE_UPLOAD_ENDPOINT,
-      apiKey: process.env.BUNNY_API_KEY,
-      storageZoneName: process.env.BUNNY_STORAGE_ZONE_NAME,
-      storagePath: process.env.BUNNY_STORAGE_PATH,
-    },
-    cdn: {
-      pullZoneEndPoint: process.env.BUNNY_PULLZONE_ENDPOINT,
-    },
-  }
 
   constructor({ }, pluginOptions) {
     super()
+    this.options = {
+      storage: {
+        storageUploadEndPoint: process.env.BUNNY_STORAGE_UPLOAD_ENDPOINT || '',
+        apiKey: process.env.BUNNY_API_KEY || '',
+        storageZoneName: process.env.BUNNY_STORAGE_ZONE_NAME || '',
+        storagePath: process.env.BUNNY_STORAGE_PATH || '',
+      },
+      cdn: {
+        pullZoneEndPoint: process.env.BUNNY_PULLZONE_ENDPOINT || '',
+      },
+    }
     if (pluginOptions) {
       this.options = pluginOptions
     }
@@ -61,7 +59,7 @@ class BunnyFileService extends FileService {
       console.log(uploadedUrl)
       return { url: uploadedUrl };
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   }
 
@@ -74,7 +72,7 @@ class BunnyFileService extends FileService {
       const options = { method: 'DELETE', headers: { AccessKey: this.options.storage.apiKey } };
       await fetch(url, options);
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   }
 

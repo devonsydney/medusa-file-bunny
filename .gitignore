@@ -4,6 +4,7 @@
 /uploads
 /node_modules
 yarn-error.log
+/.yarn
 
 .idea
 
@@ -16,3 +17,6 @@ package-lock.json
 yarn.lock
 medusa-db.sql
 build
+
+# dependencies
+.pnp*

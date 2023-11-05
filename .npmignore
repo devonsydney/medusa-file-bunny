@@ -10,6 +10,10 @@ src
 .eslintrc
 .babelrc
 .prettierrc
+build
+.cache
+.yarn
+uploads
 
 # These are files that are included in a
 # Medusa project and can be removed from a

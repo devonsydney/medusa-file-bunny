@@ -59,7 +59,6 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
   }
 
   // upload file to bunny cdn
-  // @ts-ignore
   (0, _createClass2["default"])(BunnyFileService, [{
     key: "upload",
     value: function () {
@@ -101,7 +100,7 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
         return _upload.apply(this, arguments);
       }
       return upload;
-    }() // @ts-ignore
+    }()
   }, {
     key: "delete",
     value: function () {

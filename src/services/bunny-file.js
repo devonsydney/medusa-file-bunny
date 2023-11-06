@@ -40,7 +40,6 @@ class BunnyFileService extends FileService {
   }
 
   // upload file to bunny cdn
-  // @ts-ignore
   async upload(
     fileData
   ) {
@@ -63,7 +62,6 @@ class BunnyFileService extends FileService {
     }
   }
 
-  // @ts-ignore
   async delete(
     fileData
   ) {

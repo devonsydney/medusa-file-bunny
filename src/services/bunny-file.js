@@ -3,6 +3,7 @@ import fs from "fs";
 import fetch from "node-fetch";
 import stream from "stream";
 import https from "https";
+import { parse } from "path"
 
 function getReadStreamFromCDN(url) {
   return new Promise((resolve, reject) => {
@@ -33,9 +34,11 @@ class BunnyFileService extends FileService {
 
   // upload file to bunny cdn
   async upload(file) {
-    console.log(`BunnyFileService uploading ${file.originalname}`)
+    console.log(`BUNNY: uploading ${file.originalname}`)
+    const parsedFilename = parse(file.originalname)
+    const uploadFilename = `${parsedFilename.name}-${Date.now()}${parsedFilename.ext}`
     try {
-      const uploadUrl = `${this.storageEndpoint_}/${this.storageZoneName_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${file.originalname}`
+      const uploadUrl = `${this.storageEndpoint_}/${this.storageZoneName_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${uploadFilename}`
       const readStream = fs.createReadStream(file.path);
 
       const options = {
@@ -45,7 +48,7 @@ class BunnyFileService extends FileService {
       };
 
       await fetch(uploadUrl, options);
-      const uploadedUrl = `${this.pullZoneDomain_}/${this.storagePath_}/${file.originalname}`
+      const uploadedUrl = `${this.pullZoneDomain_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${uploadFilename}`
       return { url: uploadedUrl };
     } catch (error) {
       throw error
@@ -54,7 +57,7 @@ class BunnyFileService extends FileService {
 
   // delete file from bunny CDN
   async delete(file) {
-    console.log(`BunnyFileService deleting ${file.file_key}`)
+    console.log(`BUNNY: deleting ${file.file_key}`)
     try {
       const deleteUrl = `${this.storageEndpoint_}/${this.storageZoneName_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${file.file_key}`
       const options = { method: 'DELETE', headers: { AccessKey: this.storageAccessKey_ } }
@@ -70,8 +73,9 @@ class BunnyFileService extends FileService {
     isPrivate = true,
   }
   ) {
+    console.log("BUNNY: getUploadStreamDescriptor")
     const filePath = `${this.storageEndpoint_}/${this.storageZoneName_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${name}.${ext}`
-    const downloadFilePath = `${this.pullZoneDomain_}/${this.storagePath_}/${name}.${ext}`;
+    const downloadFilePath = `${this.pullZoneDomain_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${name}.${ext}`;
     const pass = new stream.PassThrough();
 
     const options = {
@@ -89,15 +93,17 @@ class BunnyFileService extends FileService {
   }
 
   async getPresignedDownloadUrl({
-    fileKey,
+    file,
   }
   ) {
-    return `${fileKey}`
+    console.log("BUNNY: getPresignedDownloadUrl")
+    return `${file}`
   }
 
   async uploadProtected(
     file
   ) {
+    console.log("BUNNY: uploadProtected")
     const filePath = `${this.storageEndpoint_}/${this.storageZoneName_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${file.originalname}`;
     const readStream = fs.createReadStream(file.path);
 
@@ -108,7 +114,7 @@ class BunnyFileService extends FileService {
     };
 
     await fetch(filePath, options);
-    const uploadedUrl = `${this.pullZoneDomain_}/${this.storagePath_}/${file.originalname}`
+    const uploadedUrl = `${this.pullZoneDomain_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${file.originalname}`
     return {
       url: `${uploadedUrl}`,
       key: `${uploadedUrl}`,
@@ -116,11 +122,12 @@ class BunnyFileService extends FileService {
   }
 
   async getDownloadStream({
-    fileKey,
+    file,
     isPrivate = true,
   }
   ) {
-    const readStream = await getReadStreamFromCDN(fileKey)
+    console.log("BUNNY: getDownloadStream")
+    const readStream = await getReadStreamFromCDN(file)
     return readStream
   }
 }

@@ -18,6 +18,7 @@ var _fs = _interopRequireDefault(require("fs"));
 var _nodeFetch = _interopRequireDefault(require("node-fetch"));
 var _stream = _interopRequireDefault(require("stream"));
 var _https = _interopRequireDefault(require("https"));
+var _path = require("path");
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function getReadStreamFromCDN(url) {
@@ -54,13 +55,15 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
     key: "upload",
     value: function () {
       var _upload = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(file) {
-        var uploadUrl, readStream, options, uploadedUrl;
+        var parsedFilename, uploadFilename, uploadUrl, readStream, options, uploadedUrl;
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              console.log("BunnyFileService uploading ".concat(file.path));
-              _context.prev = 1;
-              uploadUrl = "".concat(this.storageEndpoint_, "/").concat(this.storageZoneName_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(file.originalname);
+              console.log("BUNNY: uploading ".concat(file.originalname));
+              parsedFilename = (0, _path.parse)(file.originalname);
+              uploadFilename = "".concat(parsedFilename.name, "-").concat(Date.now()).concat(parsedFilename.ext);
+              _context.prev = 3;
+              uploadUrl = "".concat(this.storageEndpoint_, "/").concat(this.storageZoneName_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(uploadFilename);
               readStream = _fs["default"].createReadStream(file.path);
               options = {
                 method: 'PUT',
@@ -70,22 +73,22 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
                 },
                 body: readStream
               };
-              _context.next = 7;
+              _context.next = 9;
               return (0, _nodeFetch["default"])(uploadUrl, options);
-            case 7:
-              uploadedUrl = "".concat(this.pullZoneDomain_, "/").concat(this.storagePath_, "/").concat(file.originalname);
+            case 9:
+              uploadedUrl = "".concat(this.pullZoneDomain_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(uploadFilename);
               return _context.abrupt("return", {
                 url: uploadedUrl
               });
-            case 11:
-              _context.prev = 11;
-              _context.t0 = _context["catch"](1);
+            case 13:
+              _context.prev = 13;
+              _context.t0 = _context["catch"](3);
               throw _context.t0;
-            case 14:
+            case 16:
             case "end":
               return _context.stop();
           }
-        }, _callee, this, [[1, 11]]);
+        }, _callee, this, [[3, 13]]);
       }));
       function upload(_x) {
         return _upload.apply(this, arguments);
@@ -100,7 +103,7 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
         return _regenerator["default"].wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              console.log("BunnyFileService deleting ".concat(file.file_key));
+              console.log("BUNNY: deleting ".concat(file.file_key));
               _context2.prev = 1;
               deleteUrl = "".concat(this.storageEndpoint_, "/").concat(this.storageZoneName_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(file.file_key);
               options = {
@@ -138,8 +141,9 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
               name = _ref2.name, ext = _ref2.ext, _ref2$isPrivate = _ref2.isPrivate, isPrivate = _ref2$isPrivate === void 0 ? true : _ref2$isPrivate;
+              console.log("BUNNY: getUploadStreamDescriptor");
               filePath = "".concat(this.storageEndpoint_, "/").concat(this.storageZoneName_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(name, ".").concat(ext);
-              downloadFilePath = "".concat(this.pullZoneDomain_, "/").concat(this.storagePath_, "/").concat(name, ".").concat(ext);
+              downloadFilePath = "".concat(this.pullZoneDomain_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(name, ".").concat(ext);
               pass = new _stream["default"].PassThrough();
               options = {
                 method: 'PUT',
@@ -155,7 +159,7 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
                 url: "".concat(downloadFilePath),
                 fileKey: downloadFilePath
               });
-            case 6:
+            case 7:
             case "end":
               return _context3.stop();
           }
@@ -170,13 +174,14 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
     key: "getPresignedDownloadUrl",
     value: function () {
       var _getPresignedDownloadUrl = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(_ref3) {
-        var fileKey;
+        var file;
         return _regenerator["default"].wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              fileKey = _ref3.fileKey;
-              return _context4.abrupt("return", "".concat(fileKey));
-            case 2:
+              file = _ref3.file;
+              console.log("BUNNY: getPresignedDownloadUrl");
+              return _context4.abrupt("return", "".concat(file));
+            case 3:
             case "end":
               return _context4.stop();
           }
@@ -195,6 +200,7 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
         return _regenerator["default"].wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
+              console.log("BUNNY: uploadProtected");
               filePath = "".concat(this.storageEndpoint_, "/").concat(this.storageZoneName_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(file.originalname);
               readStream = _fs["default"].createReadStream(file.path);
               options = {
@@ -205,15 +211,15 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
                 },
                 body: readStream
               };
-              _context5.next = 5;
+              _context5.next = 6;
               return (0, _nodeFetch["default"])(filePath, options);
-            case 5:
-              uploadedUrl = "".concat(this.pullZoneDomain_, "/").concat(this.storagePath_, "/").concat(file.originalname);
+            case 6:
+              uploadedUrl = "".concat(this.pullZoneDomain_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(file.originalname);
               return _context5.abrupt("return", {
                 url: "".concat(uploadedUrl),
                 key: "".concat(uploadedUrl)
               });
-            case 7:
+            case 8:
             case "end":
               return _context5.stop();
           }
@@ -228,17 +234,18 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
     key: "getDownloadStream",
     value: function () {
       var _getDownloadStream = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(_ref4) {
-        var fileKey, _ref4$isPrivate, isPrivate, readStream;
+        var file, _ref4$isPrivate, isPrivate, readStream;
         return _regenerator["default"].wrap(function _callee6$(_context6) {
           while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              fileKey = _ref4.fileKey, _ref4$isPrivate = _ref4.isPrivate, isPrivate = _ref4$isPrivate === void 0 ? true : _ref4$isPrivate;
-              _context6.next = 3;
-              return getReadStreamFromCDN(fileKey);
-            case 3:
+              file = _ref4.file, _ref4$isPrivate = _ref4.isPrivate, isPrivate = _ref4$isPrivate === void 0 ? true : _ref4$isPrivate;
+              console.log("BUNNY: getDownloadStream");
+              _context6.next = 4;
+              return getReadStreamFromCDN(file);
+            case 4:
               readStream = _context6.sent;
               return _context6.abrupt("return", readStream);
-            case 5:
+            case 6:
             case "end":
               return _context6.stop();
           }

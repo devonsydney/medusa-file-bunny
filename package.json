@@ -1,6 +1,6 @@
 {
   "name": "@devon/medusa-file-bunny",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "bunny.net file connector for Medusa",
   "author": "Devon <devon.boultonmills@gmail.com>",
   "license": "MIT",

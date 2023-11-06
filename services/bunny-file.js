@@ -59,10 +59,9 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              console.log("BUNNY: uploading ".concat(file.originalname));
               parsedFilename = (0, _path.parse)(file.originalname);
               uploadFilename = "".concat(parsedFilename.name, "-").concat(Date.now()).concat(parsedFilename.ext);
-              _context.prev = 3;
+              _context.prev = 2;
               uploadUrl = "".concat(this.storageEndpoint_, "/").concat(this.storageZoneName_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(uploadFilename);
               readStream = _fs["default"].createReadStream(file.path);
               options = {
@@ -73,22 +72,22 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
                 },
                 body: readStream
               };
-              _context.next = 9;
+              _context.next = 8;
               return (0, _nodeFetch["default"])(uploadUrl, options);
-            case 9:
+            case 8:
               uploadedUrl = "".concat(this.pullZoneDomain_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(uploadFilename);
               return _context.abrupt("return", {
                 url: uploadedUrl
               });
-            case 13:
-              _context.prev = 13;
-              _context.t0 = _context["catch"](3);
+            case 12:
+              _context.prev = 12;
+              _context.t0 = _context["catch"](2);
               throw _context.t0;
-            case 16:
+            case 15:
             case "end":
               return _context.stop();
           }
-        }, _callee, this, [[3, 13]]);
+        }, _callee, this, [[2, 12]]);
       }));
       function upload(_x) {
         return _upload.apply(this, arguments);
@@ -103,8 +102,7 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
         return _regenerator["default"].wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              console.log("BUNNY: deleting ".concat(file.file_key));
-              _context2.prev = 1;
+              _context2.prev = 0;
               deleteUrl = "".concat(this.storageEndpoint_, "/").concat(this.storageZoneName_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(file.file_key);
               options = {
                 method: 'DELETE',
@@ -112,20 +110,20 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
                   AccessKey: this.storageAccessKey_
                 }
               };
-              _context2.next = 6;
+              _context2.next = 5;
               return (0, _nodeFetch["default"])(deleteUrl, options);
-            case 6:
-              _context2.next = 11;
+            case 5:
+              _context2.next = 10;
               break;
-            case 8:
-              _context2.prev = 8;
-              _context2.t0 = _context2["catch"](1);
+            case 7:
+              _context2.prev = 7;
+              _context2.t0 = _context2["catch"](0);
               throw _context2.t0;
-            case 11:
+            case 10:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, this, [[1, 8]]);
+        }, _callee2, this, [[0, 7]]);
       }));
       function _delete(_x2) {
         return _delete2.apply(this, arguments);
@@ -141,7 +139,6 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
               name = _ref2.name, ext = _ref2.ext, _ref2$isPrivate = _ref2.isPrivate, isPrivate = _ref2$isPrivate === void 0 ? true : _ref2$isPrivate;
-              console.log("BUNNY: getUploadStreamDescriptor");
               filePath = "".concat(this.storageEndpoint_, "/").concat(this.storageZoneName_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(name, ".").concat(ext);
               downloadFilePath = "".concat(this.pullZoneDomain_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(name, ".").concat(ext);
               pass = new _stream["default"].PassThrough();
@@ -159,7 +156,7 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
                 url: "".concat(downloadFilePath),
                 fileKey: downloadFilePath
               });
-            case 7:
+            case 6:
             case "end":
               return _context3.stop();
           }
@@ -179,9 +176,8 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
               file = _ref3.file;
-              console.log("BUNNY: getPresignedDownloadUrl");
               return _context4.abrupt("return", "".concat(file));
-            case 3:
+            case 2:
             case "end":
               return _context4.stop();
           }
@@ -200,7 +196,6 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
         return _regenerator["default"].wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              console.log("BUNNY: uploadProtected");
               filePath = "".concat(this.storageEndpoint_, "/").concat(this.storageZoneName_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(file.originalname);
               readStream = _fs["default"].createReadStream(file.path);
               options = {
@@ -211,15 +206,15 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
                 },
                 body: readStream
               };
-              _context5.next = 6;
+              _context5.next = 5;
               return (0, _nodeFetch["default"])(filePath, options);
-            case 6:
+            case 5:
               uploadedUrl = "".concat(this.pullZoneDomain_, "/").concat(this.storagePath_ ? this.storagePath_ + '/' : '').concat(file.originalname);
               return _context5.abrupt("return", {
                 url: "".concat(uploadedUrl),
                 key: "".concat(uploadedUrl)
               });
-            case 8:
+            case 7:
             case "end":
               return _context5.stop();
           }
@@ -239,13 +234,12 @@ var BunnyFileService = /*#__PURE__*/function (_FileService) {
           while (1) switch (_context6.prev = _context6.next) {
             case 0:
               file = _ref4.file, _ref4$isPrivate = _ref4.isPrivate, isPrivate = _ref4$isPrivate === void 0 ? true : _ref4$isPrivate;
-              console.log("BUNNY: getDownloadStream");
-              _context6.next = 4;
+              _context6.next = 3;
               return getReadStreamFromCDN(file);
-            case 4:
+            case 3:
               readStream = _context6.sent;
               return _context6.abrupt("return", readStream);
-            case 6:
+            case 5:
             case "end":
               return _context6.stop();
           }

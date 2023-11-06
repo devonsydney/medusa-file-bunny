@@ -21,54 +21,44 @@ function getReadStreamFromCDN(url) {
 
 class BunnyFileService extends FileService {
 
-  constructor({ }, pluginOptions) {
-    super()
-    this.options = {
-      storage: {
-        storageUploadEndPoint: process.env.BUNNY_STORAGE_UPLOAD_ENDPOINT || '',
-        apiKey: process.env.BUNNY_API_KEY || '',
-        storageZoneName: process.env.BUNNY_STORAGE_ZONE_NAME || '',
-        storagePath: process.env.BUNNY_STORAGE_PATH || '',
-      },
-      cdn: {
-        pullZoneEndPoint: process.env.BUNNY_PULLZONE_ENDPOINT || '',
-      },
-    }
-    if (pluginOptions) {
-      this.options = pluginOptions
-    }
+  constructor({}, options) {
+    super({}, options)
+
+    this.storageAccessKey_ = options.storageAccessKey || '' // Bunny Storage Access Key (FTP Password)
+    this.storageEndpoint_ = options.storageEndpoint || '' // Bunny Storage Endpoint (e.g. storage.bunnycdn.com)
+    this.storageZoneName_ = options.storageZoneName || '' // Bunny Storage Zone Name
+    this.storagePath_ = options.storagePath || '' // (optional) File Path
+    this.pullZoneDomain_ = options.pullZoneDomain || '' // Bunny Pull Zone Domain
   }
 
   // upload file to bunny cdn
-  async upload(
-    fileData
-  ) {
+  async upload(file) {
+    console.log(`BunnyFileService uploading ${file.originalname}`)
     try {
-      const url = `${this.options.storage.storageUploadEndPoint}/${this.options.storage.storageZoneName}/${this.options.storage.storagePath}/${fileData.originalname}`;
-      const readStream = fs.createReadStream(fileData.path);
+      const uploadUrl = `${this.storageEndpoint_}/${this.storageZoneName_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${file.originalname}`
+      const readStream = fs.createReadStream(file.path);
 
       const options = {
         method: 'PUT',
-        headers: { 'content-type': 'application/octet-stream', AccessKey: this.options.storage.apiKey },
+        headers: { 'content-type': 'application/octet-stream', AccessKey: this.storageAccessKey_ },
         body: readStream
       };
 
-      await fetch(url, options);
-      const uploadedUrl = `${this.options.cdn.pullZoneEndPoint}/${this.options.storage.storagePath}/${fileData.originalname}`
-      console.log(uploadedUrl)
+      await fetch(uploadUrl, options);
+      const uploadedUrl = `${this.pullZoneDomain_}/${this.storagePath_}/${file.originalname}`
       return { url: uploadedUrl };
     } catch (error) {
       throw error
     }
   }
 
-  async delete(
-    fileData
-  ) {
+  // delete file from bunny CDN
+  async delete(file) {
+    console.log(`BunnyFileService deleting ${file.file_key}`)
     try {
-      const url = `${this.options.storage.storageUploadEndPoint}/${this.options.storage.storageZoneName}/${this.options.storage.storagePath}/${fileData.file_key}`
-      const options = { method: 'DELETE', headers: { AccessKey: this.options.storage.apiKey } };
-      await fetch(url, options);
+      const deleteUrl = `${this.storageEndpoint_}/${this.storageZoneName_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${file.file_key}`
+      const options = { method: 'DELETE', headers: { AccessKey: this.storageAccessKey_ } }
+      await fetch(deleteUrl, options);
     } catch (error) {
       throw error
     }
@@ -80,13 +70,13 @@ class BunnyFileService extends FileService {
     isPrivate = true,
   }
   ) {
-    const filePath = `${this.options.storage.storageUploadEndPoint}/${this.options.storage.storageZoneName}/${this.options.storage.storagePath}/${name}.${ext}`;
-    const downloadFilePath = `${this.options.cdn.pullZoneEndPoint}/${this.options.storage.storagePath}/${name}.${ext}`;
+    const filePath = `${this.storageEndpoint_}/${this.storageZoneName_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${name}.${ext}`
+    const downloadFilePath = `${this.pullZoneDomain_}/${this.storagePath_}/${name}.${ext}`;
     const pass = new stream.PassThrough();
 
     const options = {
       method: 'PUT',
-      headers: { 'content-type': 'application/octet-stream', AccessKey: this.options.storage.apiKey },
+      headers: { 'content-type': 'application/octet-stream', AccessKey: this.storageAccessKey_ },
       body: pass
     };
 
@@ -106,20 +96,19 @@ class BunnyFileService extends FileService {
   }
 
   async uploadProtected(
-    fileData
+    file
   ) {
-    // const filePath = `${this.protectedPath}/${fileData.originalname}`
-    const filePath = `${this.options.storage.storageUploadEndPoint}/${this.options.storage.storageZoneName}/${this.options.storage.storagePath}/${fileData.originalname}`;
-    const readStream = fs.createReadStream(fileData.path);
+    const filePath = `${this.storageEndpoint_}/${this.storageZoneName_}/${this.storagePath_ ? this.storagePath_ + '/' : ''}${file.originalname}`;
+    const readStream = fs.createReadStream(file.path);
 
     const options = {
       method: 'PUT',
-      headers: { 'content-type': 'application/octet-stream', AccessKey: this.options.storage.apiKey },
+      headers: { 'content-type': 'application/octet-stream', AccessKey: this.storageAccessKey_ },
       body: readStream
     };
 
     await fetch(filePath, options);
-    const uploadedUrl = `${this.options.cdn.pullZoneEndPoint}/${this.options.storage.storagePath}/${fileData.originalname}`
+    const uploadedUrl = `${this.pullZoneDomain_}/${this.storagePath_}/${file.originalname}`
     return {
       url: `${uploadedUrl}`,
       key: `${uploadedUrl}`,
